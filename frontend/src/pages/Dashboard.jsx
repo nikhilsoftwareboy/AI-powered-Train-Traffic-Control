@@ -1,4 +1,8 @@
 import { useState, useEffect } from 'react'
+import { optimizationAPI } from '../services/api'
+import { useNavigate } from 'react-router-dom'
+
+
 import {
   Grid,
   Card,
@@ -225,26 +229,53 @@ function Dashboard() {
               </Typography>
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 <Chip
-                  icon={<SpeedIcon />}
-                  label="Run AI Optimization"
-                  clickable
-                  color="primary"
-                  sx={{ py: 2, fontSize: '0.95rem' }}
-                />
+  icon={<SpeedIcon />}
+  label="Run AI Optimization"
+  clickable
+  color="primary"
+  onClick={async () => {
+    try {
+      const res = await optimizationAPI.getSchedule()
+      toast.success(
+        `AI optimized ${res.data.totalTrains} trains 🚂`
+      )
+    } catch (err) {
+      toast.error('AI Optimization failed')
+      console.error(err)
+    }
+  }}
+/>
+
                 <Chip
-                  icon={<WarningIcon />}
-                  label="View Alerts"
-                  clickable
-                  color="warning"
-                  sx={{ py: 2, fontSize: '0.95rem' }}
-                />
+  icon={<WarningIcon />}
+  label="View Alerts"
+  clickable
+  color="warning"
+  onClick={() => {
+    const alerts = congestion.filter(
+      s => s.utilization > 80
+    )
+
+    if (alerts.length === 0) {
+      toast.success('No active alerts 🚦')
+    } else {
+      alerts.forEach(a =>
+        toast.error(
+          `⚠ ${a.sectionName} congested (${a.utilization.toFixed(1)}%)`
+        )
+      )
+    }
+  }}
+/>
+
                 <Chip
-                  icon={<TrendingUpIcon />}
-                  label="View Analytics"
-                  clickable
-                  color="secondary"
-                  sx={{ py: 2, fontSize: '0.95rem' }}
-                />
+  icon={<TrendingUpIcon />}
+  label="View Analytics"
+  clickable
+  color="secondary"
+  onClick={() => navigate('/analytics')}
+/>
+
               </Box>
             </CardContent>
           </Card>
