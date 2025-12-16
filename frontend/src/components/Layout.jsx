@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import {
   Box,
   Drawer,
@@ -38,7 +38,7 @@ const menuItems = [
   { text: 'Sections', icon: <TrackIcon />, path: '/sections' }
 ]
 
-function Layout() {
+function Layout({ children }) {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -96,7 +96,6 @@ function Layout() {
 
   return (
     <Box sx={{ display: 'flex' }}>
-      {/* Top AppBar */}
       <AppBar
         position="fixed"
         sx={{
@@ -110,42 +109,53 @@ function Layout() {
       >
         <Toolbar>
           <IconButton
+            color="inherit"
+            aria-label="open drawer"
             edge="start"
             onClick={handleDrawerToggle}
             sx={{ mr: 2, display: { md: 'none' } }}
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" sx={{ color: 'text.primary' }}>
+          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1, color: 'text.primary' }}>
             {menuItems.find(item => item.path === location.pathname)?.text || 'Dashboard'}
           </Typography>
         </Toolbar>
       </AppBar>
-
-      {/* Sidebar */}
-      <Box component="nav" sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 } }}>
+      <Box
+        component="nav"
+        sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 } }}
+      >
         <Drawer
           variant="temporary"
           open={mobileOpen}
           onClose={handleDrawerToggle}
+          ModalProps={{
+            keepMounted: true
+          }}
           sx={{
             display: { xs: 'block', md: 'none' },
             '& .MuiDrawer-paper': {
+              boxSizing: 'border-box',
               width: drawerWidth,
-              bgcolor: 'background.paper'
+              bgcolor: 'background.paper',
+              borderRight: '1px solid',
+              borderColor: 'divider'
             }
           }}
         >
           {drawer}
         </Drawer>
-
         <Drawer
           variant="permanent"
           sx={{
             display: { xs: 'none', md: 'block' },
             '& .MuiDrawer-paper': {
+              boxSizing: 'border-box',
               width: drawerWidth,
-              bgcolor: 'background.paper'
+              bgcolor: 'background.paper',
+              borderRight: '1px solid',
+              borderColor: 'divider'
             }
           }}
           open
@@ -153,8 +163,6 @@ function Layout() {
           {drawer}
         </Drawer>
       </Box>
-
-      {/* MAIN CONTENT */}
       <Box
         component="main"
         sx={{
@@ -169,8 +177,7 @@ function Layout() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
         >
-          {/* 🔑 THIS FIXES EVERYTHING */}
-          <Outlet />
+          {children}
         </motion.div>
       </Box>
     </Box>
@@ -178,3 +185,4 @@ function Layout() {
 }
 
 export default Layout
+
