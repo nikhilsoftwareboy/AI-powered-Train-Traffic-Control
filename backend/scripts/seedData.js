@@ -71,84 +71,75 @@ const seedData = async () => {
 
     console.log(`Created ${sections.length} sections`)
 
-    // Create trains
-    const trains = await Train.insertMany([
-      {
-        trainId: 'TRN-001',
-        name: 'Express Alpha',
-        currentSection: sections[0]._id,
-        nextSection: sections[1]._id,
-        speed: 95,
-        maxSpeed: 120,
-        position: { latitude: 28.6500, longitude: 77.1800 },
-        status: 'running',
-        priority: 5,
-        passengers: 850,
-        delay: 0,
-        scheduledArrival: new Date(Date.now() + 3600000),
-        estimatedArrival: new Date(Date.now() + 3600000)
-      },
-      {
-        trainId: 'TRN-002',
-        name: 'Rapid Beta',
-        currentSection: sections[1]._id,
-        nextSection: sections[2]._id,
-        speed: 88,
-        maxSpeed: 100,
-        position: { latitude: 28.6200, longitude: 77.2500 },
-        status: 'running',
-        priority: 4,
-        passengers: 720,
-        delay: 45,
-        scheduledArrival: new Date(Date.now() + 2700000),
-        estimatedArrival: new Date(Date.now() + 2745000)
-      },
-      {
-        trainId: 'TRN-003',
-        name: 'Metro Gamma',
-        currentSection: sections[3]._id,
-        nextSection: sections[0]._id,
-        speed: 65,
-        maxSpeed: 80,
-        position: { latitude: 28.5500, longitude: 77.1000 },
-        status: 'delayed',
-        priority: 3,
-        passengers: 1200,
-        delay: 180,
-        scheduledArrival: new Date(Date.now() + 1800000),
-        estimatedArrival: new Date(Date.now() + 1980000)
-      },
-      {
-        trainId: 'TRN-004',
-        name: 'Freight Delta',
-        currentSection: sections[2]._id,
-        nextSection: sections[3]._id,
-        speed: 75,
-        maxSpeed: 140,
-        position: { latitude: 28.5800, longitude: 77.3000 },
-        status: 'running',
-        priority: 2,
-        passengers: 0,
-        delay: 0,
-        scheduledArrival: new Date(Date.now() + 5400000),
-        estimatedArrival: new Date(Date.now() + 5400000)
-      },
-      {
-        trainId: 'TRN-005',
-        name: 'Local Epsilon',
-        currentSection: sections[0]._id,
-        nextSection: sections[1]._id,
-        speed: 60,
-        maxSpeed: 120,
-        position: { latitude: 28.6400, longitude: 77.2000 },
-        status: 'running',
-        priority: 1,
-        passengers: 450,
-        delay: 90,
-        scheduledArrival: new Date(Date.now() + 4200000),
-        estimatedArrival: new Date(Date.now() + 4290000)
-      }
-    ])
+    // Create trains (REAL INDIAN TRAINS)
+const trains = await Train.insertMany([
+  {
+    trainId: 'TRN-001',
+    name: 'Vande Bharat Express',
+    currentSection: sections[0]._id,
+    nextSection: sections[1]._id,
+    speed: 110,
+    maxSpeed: 160,
+    position: { latitude: 28.6139, longitude: 77.2090 }, // New Delhi
+    status: 'running',
+    priority: 5,
+    passengers: 600,
+    delay: 0
+  },
+  {
+    trainId: 'TRN-002',
+    name: 'Rajdhani Express',
+    currentSection: sections[1]._id,
+    nextSection: sections[2]._id,
+    speed: 100,
+    maxSpeed: 130,
+    position: { latitude: 28.7041, longitude: 77.1025 },
+    status: 'running',
+    priority: 5,
+    passengers: 900,
+    delay: 0
+  },
+  {
+    trainId: 'TRN-003',
+    name: 'Amritsar Shatabdi Express',
+    currentSection: sections[2]._id,
+    nextSection: sections[3]._id,
+    speed: 95,
+    maxSpeed: 130,
+    position: { latitude: 28.5355, longitude: 77.3910 },
+    status: 'running',
+    priority: 4,
+    passengers: 750,
+    delay: 45
+  },
+  {
+    trainId: 'TRN-004',
+    name: 'Shaane Punjab Express',
+    currentSection: sections[3]._id,
+    nextSection: sections[0]._id,
+    speed: 90,
+    maxSpeed: 110,
+    position: { latitude: 28.4595, longitude: 77.0266 },
+    status: 'running',
+    priority: 3,
+    passengers: 820,
+    delay: 60
+  },
+  {
+    trainId: 'TRN-005',
+    name: 'Amritsar Intercity Express',
+    currentSection: sections[0]._id,
+    nextSection: sections[1]._id,
+    speed: 85,
+    maxSpeed: 110,
+    position: { latitude: 31.6340, longitude: 74.8723 }, // Amritsar
+    status: 'running',
+    priority: 3,
+    passengers: 500,
+    delay: 90
+  }
+])
+
 
     console.log(`Created ${trains.length} trains`)
 

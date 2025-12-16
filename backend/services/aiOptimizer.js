@@ -55,10 +55,22 @@ class AIOptimizer {
   generateSchedule(trains, sections, metrics) {
     // Sort trains by priority and delay
     const sortedTrains = [...trains].sort((a, b) => {
-      const priorityDiff = (b.priority || 1) - (a.priority || 1);
-      if (priorityDiff !== 0) return priorityDiff;
-      return (b.delay || 0) - (a.delay || 0);
-    });
+  // HARD priority boost for premium trains
+  const premiumBoost = (train) =>
+    train.name.includes('Rajdhani') || train.name.includes('Vande Bharat')
+      ? 2
+      : 0
+
+  const priorityScoreA = (a.priority || 1) + premiumBoost(a)
+  const priorityScoreB = (b.priority || 1) + premiumBoost(b)
+
+  if (priorityScoreB !== priorityScoreA) {
+    return priorityScoreB - priorityScoreA
+  }
+
+  return (b.delay || 0) - (a.delay || 0)
+})
+
 
     const schedule = [];
     const sectionOccupancy = new Map();
