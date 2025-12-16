@@ -65,6 +65,7 @@ const StatCard = ({ title, value, icon, color, subtitle, trend }) => (
 )
 
 function Dashboard() {
+  const navigate = useNavigate()
   const [dashboardData, setDashboardData] = useState(null)
   const [loading, setLoading] = useState(true)
 
