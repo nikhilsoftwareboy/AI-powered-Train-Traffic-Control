@@ -7,26 +7,53 @@ require('dotenv').config();
 
 const app = express();
 const server = http.createServer(app);
+
+/* =======================
+   ALLOWED ORIGINS (CORS)
+======================= */
+const allowedOrigins = [
+  process.env.CLIENT_URL,        // Vercel frontend
+  'http://localhost:3000'        // Local dev
+].filter(Boolean);
+
+/* =======================
+   SOCKET.IO SETUP
+======================= */
 const io = socketIo(server, {
   cors: {
-    origin: process.env.CLIENT_URL || "http://localhost:3000",
-    methods: ["GET", "POST"]
+    origin: allowedOrigins,
+    methods: ['GET', 'POST'],
+    credentials: true
   }
 });
 
-// Middleware
-app.use(cors());
+/* =======================
+   MIDDLEWARE
+======================= */
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true
+}));
 app.use(express.json());
 
-// Database connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/train-control', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => console.log('MongoDB connected'))
-.catch(err => console.error('MongoDB connection error:', err));
+/* =======================
+   DATABASE CONNECTION
+======================= */
+mongoose.connect(
+  process.env.MONGODB_URI || 'mongodb://localhost:27017/train-control',
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  }
+)
+.then(() => console.log('✅ MongoDB connected'))
+.catch(err => console.error('❌ MongoDB connection error:', err));
 
-// Routes
+
+
+/* =======================
+   ROUTES
+======================= */
 const trainRoutes = require('./routes/trains');
 const sectionRoutes = require('./routes/sections');
 const optimizationRoutes = require('./routes/optimization');
@@ -37,25 +64,38 @@ app.use('/api/sections', sectionRoutes);
 app.use('/api/optimization', optimizationRoutes);
 app.use('/api/analytics', analyticsRoutes);
 
-// Socket.io for real-time updates
+/* =======================
+   HEALTH CHECK (RENDER)
+======================= */
+app.get('/healthz', (req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
+
+/* =======================
+   SOCKET.IO EVENTS
+======================= */
 io.on('connection', (socket) => {
-  console.log('Client connected:', socket.id);
+  console.log('🔌 Client connected:', socket.id);
 
   socket.on('subscribe', (sectionId) => {
     socket.join(`section-${sectionId}`);
-    console.log(`Client ${socket.id} subscribed to section ${sectionId}`);
+    console.log(`📡 Client ${socket.id} subscribed to section ${sectionId}`);
   });
 
   socket.on('disconnect', () => {
-    console.log('Client disconnected:', socket.id);
+    console.log('❌ Client disconnected:', socket.id);
   });
 });
 
-// Make io available to routes
+/* =======================
+   MAKE IO AVAILABLE
+======================= */
 app.set('io', io);
 
+/* =======================
+   START SERVER
+======================= */
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
-
