@@ -9,6 +9,32 @@ const api = axios.create({
   }
 })
 
+// Add token to requests if available
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token')
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
+    return config
+  },
+  (error) => {
+    return Promise.reject(error)
+  }
+)
+
+// Handle 401 errors (unauthorized)
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token')
+      window.location.href = '/login'
+    }
+    return Promise.reject(error)
+  }
+)
+
 // Trains API
 export const trainsAPI = {
   getAll: () => api.get('/trains'),
@@ -40,6 +66,14 @@ export const analyticsAPI = {
   getDashboard: () => api.get('/analytics/dashboard'),
   getTimeSeries: (hours = 24) => api.get(`/analytics/timeseries?hours=${hours}`),
   getSectionPerformance: () => api.get('/analytics/sections/performance')
+}
+
+// Auth API
+export const authAPI = {
+  login: (credentials) => api.post('/auth/login', credentials),
+  register: (userData) => api.post('/auth/register', userData),
+  getMe: () => api.get('/auth/me'),
+  logout: () => api.post('/auth/logout')
 }
 
 export default api

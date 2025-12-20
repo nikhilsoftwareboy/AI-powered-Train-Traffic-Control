@@ -14,7 +14,12 @@ import {
   ListItemIcon,
   ListItemText,
   useTheme,
-  useMediaQuery
+  useMediaQuery,
+  Button,
+  Avatar,
+  Chip,
+  Menu,
+  MenuItem
 } from '@mui/material'
 import {
   Dashboard as DashboardIcon,
@@ -23,9 +28,12 @@ import {
   Analytics as AnalyticsIcon,
   Train as TrainIcon,
   TrackChanges as TrackIcon,
-  Menu as MenuIcon
+  Menu as MenuIcon,
+  Logout as LogoutIcon,
+  AccountCircle as AccountCircleIcon
 } from '@mui/icons-material'
 import { motion } from 'framer-motion'
+import { useAuth } from '../contexts/AuthContext'
 
 const drawerWidth = 280
 
@@ -42,11 +50,27 @@ function Layout({ children }) {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [anchorEl, setAnchorEl] = useState(null)
   const location = useLocation()
   const navigate = useNavigate()
+  const { user, logout } = useAuth()
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
+  }
+
+  const handleMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget)
+  }
+
+  const handleMenuClose = () => {
+    setAnchorEl(null)
+  }
+
+  const handleLogout = () => {
+    handleMenuClose()
+    logout()
+    navigate('/login')
   }
 
   const drawer = (
@@ -59,6 +83,27 @@ function Layout({ children }) {
           AI-Powered Traffic Management
         </Typography>
       </Box>
+      <Divider />
+      {user && (
+        <Box sx={{ px: 2, py: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+            <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main' }}>
+              {user.fullName?.charAt(0) || user.username?.charAt(0) || 'U'}
+            </Avatar>
+            <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+              <Typography variant="body2" sx={{ fontWeight: 500, truncate: true }}>
+                {user.fullName || user.username}
+              </Typography>
+              <Chip
+                label={user.role}
+                size="small"
+                color="primary"
+                sx={{ height: 18, fontSize: '0.65rem', mt: 0.5 }}
+              />
+            </Box>
+          </Box>
+        </Box>
+      )}
       <Divider />
       <List sx={{ px: 2, pt: 2 }}>
         {menuItems.map((item) => (
@@ -120,6 +165,60 @@ function Layout({ children }) {
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1, color: 'text.primary' }}>
             {menuItems.find(item => item.path === location.pathname)?.text || 'Dashboard'}
           </Typography>
+          {user && (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center', gap: 1 }}>
+                <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main' }}>
+                  {user.fullName?.charAt(0) || user.username?.charAt(0) || 'U'}
+                </Avatar>
+                <Box>
+                  <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                    {user.fullName || user.username}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    {user.role}
+                  </Typography>
+                </Box>
+              </Box>
+              <IconButton
+                onClick={handleMenuOpen}
+                sx={{ color: 'text.primary' }}
+              >
+                <AccountCircleIcon />
+              </IconButton>
+              <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleMenuClose}
+                anchorOrigin={{
+                  vertical: 'bottom',
+                  horizontal: 'right',
+                }}
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+              >
+                <MenuItem disabled>
+                  <Box>
+                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                      {user.fullName || user.username}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {user.email}
+                    </Typography>
+                  </Box>
+                </MenuItem>
+                <Divider />
+                <MenuItem onClick={handleLogout}>
+                  <ListItemIcon>
+                    <LogoutIcon fontSize="small" />
+                  </ListItemIcon>
+                  <Typography variant="body2">Logout</Typography>
+                </MenuItem>
+              </Menu>
+            </Box>
+          )}
         </Toolbar>
       </AppBar>
       <Box

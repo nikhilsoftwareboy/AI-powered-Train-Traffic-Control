@@ -58,7 +58,9 @@ const trainRoutes = require('./routes/trains');
 const sectionRoutes = require('./routes/sections');
 const optimizationRoutes = require('./routes/optimization');
 const analyticsRoutes = require('./routes/analytics');
+const authRoutes = require('./routes/auth');
 
+app.use('/api/auth', authRoutes);
 app.use('/api/trains', trainRoutes);
 app.use('/api/sections', sectionRoutes);
 app.use('/api/optimization', optimizationRoutes);

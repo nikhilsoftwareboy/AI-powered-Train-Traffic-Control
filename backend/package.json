@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "seed": "node scripts/seedData.js"
+    "seed": "node scripts/seedData.js",
+    "seed:user": "node scripts/seedUser.js"
   },
   "keywords": ["train", "traffic", "control", "ai", "optimization"],
   "author": "",

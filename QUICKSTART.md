@@ -33,8 +33,17 @@ CLIENT_URL=http://localhost:3000
 JWT_SECRET=your-secret-key-here
 ```
 
-### Step 4: Seed Sample Data (Optional)
+### Step 4: Seed Default Users and Sample Data
 
+**Seed Users (Recommended):**
+```bash
+cd backend
+npm run seed:user
+```
+
+This creates default admin and operator accounts.
+
+**Seed Sample Data (Optional):**
 ```bash
 cd backend
 npm run seed
@@ -59,6 +68,10 @@ npm run dev
 ### Step 6: Open the Application
 
 Navigate to: **http://localhost:3000**
+
+**Login Credentials:**
+- Email: `admin@traincontrol.com`
+- Password: `admin123`
 
 ## 📱 Available Pages
 

@@ -6,6 +6,7 @@ A full-stack web application for maximizing section throughput using AI-powered 
 
 ## ✨ Features
 
+- **User Authentication**: Secure login/logout system with JWT tokens and role-based access
 - **Real-time Train Monitoring**: Live tracking of train positions, speeds, and status
 - **AI-Powered Optimization**: Intelligent scheduling and speed recommendations using ML algorithms
 - **Interactive Map Visualization**: Leaflet-based map showing train positions and sections
@@ -97,7 +98,20 @@ net start MongoDB
 mongod
 ```
 
-### 6. Run the Application
+### 6. Seed Default Users (Optional but Recommended)
+
+Create default admin and operator accounts:
+
+```bash
+cd backend
+npm run seed:user
+```
+
+This creates:
+- **Admin**: `admin@traincontrol.com` / `admin123`
+- **Operator**: `operator@traincontrol.com` / `operator123`
+
+### 7. Run the Application
 
 **Terminal 1 - Backend:**
 ```bash
@@ -114,6 +128,10 @@ npm run dev
 The application will be available at:
 - Frontend: http://localhost:3000
 - Backend API: http://localhost:5000
+
+**Note**: You'll need to login first. Use the default credentials:
+- Email: `admin@traincontrol.com`
+- Password: `admin123`
 
 ## 📁 Project Structure
 
@@ -201,6 +219,12 @@ The system uses machine learning algorithms to:
 - `GET /api/analytics/timeseries` - Get time series data
 - `GET /api/analytics/sections/performance` - Get section performance
 
+### Authentication
+- `POST /api/auth/register` - Register a new user
+- `POST /api/auth/login` - Login user
+- `GET /api/auth/me` - Get current user (requires auth)
+- `POST /api/auth/logout` - Logout user (requires auth)
+
 ## 🎨 UI Features
 
 - **Dark Theme**: Modern dark theme with cyan accent colors
@@ -210,9 +234,24 @@ The system uses machine learning algorithms to:
 - **Live Map**: Leaflet map with real-time train markers
 - **Toast Notifications**: User-friendly notifications
 
+## 🔐 Authentication
+
+The system includes a complete authentication system:
+
+- **JWT-based authentication** with secure token storage
+- **Role-based access control** (Admin, Operator, Viewer)
+- **Protected routes** - all dashboard pages require login
+- **User management** - register new users with different roles
+- **Secure password hashing** using bcrypt
+
+### Default Users
+
+After running `npm run seed:user`, you can login with:
+- **Admin**: `admin@traincontrol.com` / `admin123`
+- **Operator**: `operator@traincontrol.com` / `operator123`
+
 ## 🔮 Future Enhancements
 
-- [ ] User authentication and authorization
 - [ ] Historical data analysis
 - [ ] Advanced ML models (LSTM, Transformer)
 - [ ] Mobile app (React Native)
