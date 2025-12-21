@@ -1,7 +1,6 @@
 import axios from 'axios'
 
-const API_URL =
-  import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
 
 const api = axios.create({
   baseURL: API_URL,
@@ -10,7 +9,7 @@ const api = axios.create({
   }
 })
 
-// ✅ Attach token ONLY if exists
+// Add token to requests if available
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token')
@@ -19,56 +18,63 @@ api.interceptors.request.use(
     }
     return config
   },
-  (error) => Promise.reject(error)
+  (error) => {
+    return Promise.reject(error)
+  }
 )
 
-// ❌ DO NOT auto-redirect on auth errors
-// Let frontend handle login/register errors
+// Handle 401 errors (unauthorized)
 api.interceptors.response.use(
   (response) => response,
-  (error) => Promise.reject(error)
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token')
+      window.location.href = '/login'
+    }
+    return Promise.reject(error)
+  }
 )
-
-/* ===================== APIs ===================== */
-
-// Auth API
-export const authAPI = {
-  login: (data) => api.post('/auth/login', data),
-  register: (data) => api.post('/auth/register', data),
-  getMe: () => api.get('/auth/me')
-}
 
 // Trains API
 export const trainsAPI = {
   getAll: () => api.get('/trains'),
+  getById: (id) => api.get(`/trains/${id}`),
   create: (data) => api.post('/trains', data),
   update: (id, data) => api.put(`/trains/${id}`, data),
-  delete: (id) => api.delete(`/trains/${id}`)
+  delete: (id) => api.delete(`/trains/${id}`),
+  updatePosition: (id, position) => api.post(`/trains/${id}/position`, position)
 }
 
 // Sections API
 export const sectionsAPI = {
   getAll: () => api.get('/sections'),
+  getById: (id) => api.get(`/sections/${id}`),
   create: (data) => api.post('/sections', data),
-  update: (id, data) => api.put(`/sections/${id}`, data)
-}
-
-// Analytics API
-export const analyticsAPI = {
-  getDashboard: () => api.get('/analytics/dashboard'),
-  getTimeSeries: (hours = 24) =>
-    api.get(`/analytics/timeseries?hours=${hours}`),
-  getSectionPerformance: () =>
-    api.get('/analytics/sections/performance')
+  update: (id, data) => api.put(`/sections/${id}`, data),
+  getStats: (id) => api.get(`/sections/${id}/stats`)
 }
 
 // Optimization API
 export const optimizationAPI = {
   getSchedule: () => api.post('/optimization/schedule'),
-  getPredictions: (horizon = 15) =>
-    api.get(`/optimization/predictions?horizon=${horizon}`),
-  applyRecommendations: (recommendations) =>
-    api.post('/optimization/apply', { recommendations })
+  getPredictions: (horizon = 15) => api.get(`/optimization/predictions?horizon=${horizon}`),
+  applyRecommendations: (recommendations) => api.post('/optimization/apply', { recommendations })
+}
+
+// Analytics API
+export const analyticsAPI = {
+  getDashboard: () => api.get('/analytics/dashboard'),
+  getTimeSeries: (hours = 24) => api.get(`/analytics/timeseries?hours=${hours}`),
+  getSectionPerformance: () => api.get('/analytics/sections/performance')
+}
+
+// Auth API
+export const authAPI = {
+  login: (credentials) => api.post('/auth/login', credentials),
+  register: (userData) => api.post('/auth/register', userData),
+  getMe: () => api.get('/auth/me'),
+  logout: () => api.post('/auth/logout')
 }
 
 export default api
+
