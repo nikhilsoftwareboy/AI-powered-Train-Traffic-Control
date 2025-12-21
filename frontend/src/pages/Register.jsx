@@ -11,8 +11,7 @@ import {
   Alert,
   InputAdornment,
   IconButton,
-  Divider,
-  MenuItem
+  Divider
 } from '@mui/material'
 import {
   Visibility,
@@ -24,17 +23,15 @@ import {
 } from '@mui/icons-material'
 import { motion } from 'framer-motion'
 import { useAuth } from '../contexts/AuthContext'
-import toast from 'react-hot-toast'
 
 function Register() {
   const [formData, setFormData] = useState({
     username: '',
     email: '',
     password: '',
-    confirmPassword: '',
-    fullName: '',
-    role: 'operator'
+    confirmPassword: ''
   })
+
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [error, setError] = useState('')
@@ -50,10 +47,7 @@ function Register() {
   }, [isAuthenticated, navigate])
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    })
+    setFormData({ ...formData, [e.target.name]: e.target.value })
     setError('')
   }
 
@@ -62,34 +56,35 @@ function Register() {
     setError('')
     setLoading(true)
 
-    // Validation
-    if (!formData.username || !formData.email || !formData.password) {
-      setError('Please fill in all required fields')
+    const { username, email, password, confirmPassword } = formData
+
+    if (!username || !email || !password) {
+      setError('All fields are required')
       setLoading(false)
       return
     }
 
-    if (formData.password !== formData.confirmPassword) {
+    if (password !== confirmPassword) {
       setError('Passwords do not match')
       setLoading(false)
       return
     }
 
-    if (formData.password.length < 6) {
+    if (password.length < 6) {
       setError('Password must be at least 6 characters')
       setLoading(false)
       return
     }
 
-    const { confirmPassword, ...registerData } = formData
-    const result = await register(registerData)
-    
+    // ✅ SEND ONLY REQUIRED DATA
+    const result = await register({ username, email, password })
+
     if (result.success) {
       navigate('/')
     } else {
       setError(result.error || 'Registration failed')
     }
-    
+
     setLoading(false)
   }
 
@@ -100,74 +95,23 @@ function Register() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        bgcolor: 'background.default',
-        backgroundImage: 'linear-gradient(135deg, #0a0e27 0%, #151932 100%)',
-        py: 4
+        backgroundImage: 'linear-gradient(135deg, #0a0e27 0%, #151932 100%)'
       }}
     >
       <Container maxWidth="sm">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <Card
-            sx={{
-              bgcolor: 'background.paper',
-              border: '1px solid',
-              borderColor: 'divider',
-              borderRadius: 3,
-              boxShadow: '0 8px 32px rgba(0, 212, 255, 0.1)'
-            }}
-          >
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+          <Card>
             <CardContent sx={{ p: 4 }}>
-              <Box sx={{ textAlign: 'center', mb: 4 }}>
-                <Box
-                  sx={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    width: 64,
-                    height: 64,
-                    borderRadius: '50%',
-                    bgcolor: 'primary.main',
-                    mb: 2
-                  }}
-                >
-                  <TrainIcon sx={{ fontSize: 32, color: 'white' }} />
-                </Box>
-                <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
+              <Box textAlign="center" mb={3}>
+                <TrainIcon sx={{ fontSize: 40, color: 'primary.main' }} />
+                <Typography variant="h4" fontWeight={700}>
                   Create Account
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Sign up to get started
                 </Typography>
               </Box>
 
-              {error && (
-                <Alert severity="error" sx={{ mb: 3 }}>
-                  {error}
-                </Alert>
-              )}
+              {error && <Alert severity="error">{error}</Alert>}
 
               <form onSubmit={handleSubmit}>
-                <TextField
-                  fullWidth
-                  label="Full Name"
-                  name="fullName"
-                  value={formData.fullName}
-                  onChange={handleChange}
-                  margin="normal"
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <PersonIcon color="action" />
-                      </InputAdornment>
-                    )
-                  }}
-                  sx={{ mb: 2 }}
-                />
-
                 <TextField
                   fullWidth
                   label="Username"
@@ -179,16 +123,15 @@ function Register() {
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <PersonIcon color="action" />
+                        <PersonIcon />
                       </InputAdornment>
                     )
                   }}
-                  sx={{ mb: 2 }}
                 />
 
                 <TextField
                   fullWidth
-                  label="Email Address"
+                  label="Email"
                   name="email"
                   type="email"
                   value={formData.email}
@@ -198,27 +141,11 @@ function Register() {
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <EmailIcon color="action" />
+                        <EmailIcon />
                       </InputAdornment>
                     )
                   }}
-                  sx={{ mb: 2 }}
                 />
-
-                <TextField
-                  fullWidth
-                  label="Role"
-                  name="role"
-                  select
-                  value={formData.role}
-                  onChange={handleChange}
-                  margin="normal"
-                  sx={{ mb: 2 }}
-                >
-                  <MenuItem value="operator">Operator</MenuItem>
-                  <MenuItem value="viewer">Viewer</MenuItem>
-                  <MenuItem value="admin">Admin</MenuItem>
-                </TextField>
 
                 <TextField
                   fullWidth
@@ -232,21 +159,15 @@ function Register() {
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <LockIcon color="action" />
+                        <LockIcon />
                       </InputAdornment>
                     ),
                     endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          onClick={() => setShowPassword(!showPassword)}
-                          edge="end"
-                        >
-                          {showPassword ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                      </InputAdornment>
+                      <IconButton onClick={() => setShowPassword(!showPassword)}>
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
                     )
                   }}
-                  sx={{ mb: 2 }}
                 />
 
                 <TextField
@@ -261,61 +182,33 @@ function Register() {
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <LockIcon color="action" />
+                        <LockIcon />
                       </InputAdornment>
                     ),
                     endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                          edge="end"
-                        >
-                          {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                      </InputAdornment>
+                      <IconButton onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+                        {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
                     )
                   }}
-                  sx={{ mb: 3 }}
                 />
 
                 <Button
-                  type="submit"
                   fullWidth
+                  type="submit"
                   variant="contained"
-                  size="large"
+                  sx={{ mt: 2 }}
                   disabled={loading}
-                  sx={{
-                    py: 1.5,
-                    mb: 2,
-                    fontSize: '1rem',
-                    fontWeight: 600
-                  }}
                 >
-                  {loading ? 'Creating account...' : 'Sign Up'}
+                  {loading ? 'Creating Account...' : 'Sign Up'}
                 </Button>
               </form>
 
-              <Divider sx={{ my: 3 }}>
-                <Typography variant="body2" color="text.secondary">
-                  OR
-                </Typography>
-              </Divider>
+              <Divider sx={{ my: 3 }} />
 
-              <Box sx={{ textAlign: 'center' }}>
-                <Typography variant="body2" color="text.secondary">
-                  Already have an account?{' '}
-                  <Link
-                    to="/login"
-                    style={{
-                      color: '#00d4ff',
-                      textDecoration: 'none',
-                      fontWeight: 600
-                    }}
-                  >
-                    Sign in here
-                  </Link>
-                </Typography>
-              </Box>
+              <Typography align="center">
+                Already have an account? <Link to="/login">Login</Link>
+              </Typography>
             </CardContent>
           </Card>
         </motion.div>
@@ -325,4 +218,3 @@ function Register() {
 }
 
 export default Register
-
