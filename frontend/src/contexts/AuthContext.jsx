@@ -17,34 +17,40 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true)
   const [token, setToken] = useState(localStorage.getItem('token'))
 
+  // 🔹 Run ONLY ONCE when app loads
   useEffect(() => {
-    if (token) {
-      // Verify token and get user info
-      authAPI.getMe()
-        .then(response => {
-          setUser(response.data.user)
-          setLoading(false)
-        })
-        .catch(() => {
-          // Token invalid, remove it
-          localStorage.removeItem('token')
-          setToken(null)
-          setUser(null)
-          setLoading(false)
-        })
-    } else {
-      setLoading(false)
-    }
-  }, [token])
+    const loadUser = async () => {
+      if (!token) {
+        setLoading(false)
+        return
+      }
 
+      try {
+        const response = await authAPI.getMe()
+        setUser(response.data.user)
+      } catch (error) {
+        console.error('Auth check failed')
+        localStorage.removeItem('token')
+        setToken(null)
+        setUser(null)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadUser()
+  }, []) // ❗ IMPORTANT: empty dependency array
+
+  // 🔹 LOGIN
   const login = async (email, password) => {
     try {
       const response = await authAPI.login({ email, password })
       const { token: newToken, user: userData } = response.data
-      
+
       localStorage.setItem('token', newToken)
       setToken(newToken)
       setUser(userData)
+
       toast.success('Login successful!')
       return { success: true }
     } catch (error) {
@@ -54,14 +60,16 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
+  // 🔹 REGISTER
   const register = async (userData) => {
     try {
       const response = await authAPI.register(userData)
       const { token: newToken, user: userInfo } = response.data
-      
+
       localStorage.setItem('token', newToken)
       setToken(newToken)
       setUser(userInfo)
+
       toast.success('Registration successful!')
       return { success: true }
     } catch (error) {
@@ -71,6 +79,7 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
+  // 🔹 LOGOUT
   const logout = () => {
     localStorage.removeItem('token')
     setToken(null)
@@ -81,13 +90,16 @@ export const AuthProvider = ({ children }) => {
   const value = {
     user,
     token,
+    loading,
     login,
     register,
     logout,
-    loading,
-    isAuthenticated: !!user
+    isAuthenticated: !!token // ✅ FIXED
   }
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  )
 }
-
