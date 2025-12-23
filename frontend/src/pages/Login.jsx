@@ -225,7 +225,7 @@ function Login() {
                   Email: admin@traincontrol.com
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  Password: admin123
+                  Password: admin@123
                 </Typography>
               </Box>
             </CardContent>
